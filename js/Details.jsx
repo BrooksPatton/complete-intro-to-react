@@ -1,11 +1,16 @@
 const React = require('react')
 const Header = require('./Header')
-
+const { connector } = require('./Store')
+//
 class Details extends React.Component {
-  render () {
-    const params = this.props.params || {}
-    const {title, description, year, poster, trailer} = params
+  assignShow (id) {
+    const showArray = this.props.shows.filter((show) => show.imdbID === id)
+    return showArray[0]
+  }
 
+  render () {
+    const { title, description, year, poster, trailer } = this.assignShow(this.props.params.id)
+    console.log(title)
     return (
       <div className='container'>
         <Header />
@@ -23,10 +28,11 @@ class Details extends React.Component {
   }
 }
 
-const {object} = React.PropTypes
+const { object, arrayOf } = React.PropTypes
 
 Details.propTypes = {
-  params: object.isRequired
+  shows: arrayOf(object).isRequired,
+  params: object
 }
 
-module.exports = Details
+module.exports = connector(Details)

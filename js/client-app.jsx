@@ -5,27 +5,18 @@ const {Router, Route, hashHistory, IndexRoute} = require('react-router')
 const Search = require('./search')
 const Layout = require('./layout')
 const Details = require('./Details')
-const {shows} = require('../public/data')
 const {store} = require('./Store')
 const {Provider} = require('react-redux')
 
 const App = React.createClass({
-  assignShow (nextState, replace) {
-    const filteredShows = shows.filter((show) => show.imdbID === nextState.params.id)
-
-    Object.assign(nextState.params, filteredShows[0])
-
-    return filteredShows.length > 0 ? nextState : replace('/')
-  },
-
   render () {
     return (
       <Provider store={store}>
         <Router history={hashHistory}>
           <Route path='/' component={Layout}>
             <IndexRoute component={Landing} />
-            <Route path='/search' component={Search} shows={shows} />
-            <Route path='/details/:id' component={Details} onEnter={this.assignShow} />
+            <Route path='/search' component={Search} />
+            <Route path='/details/:id' component={Details} />
           </Route>
         </Router>
       </Provider>
