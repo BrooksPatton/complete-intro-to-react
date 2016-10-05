@@ -6,14 +6,14 @@ const Layout = require('./layout')
 const Details = require('./Details')
 const {store} = require('./Store')
 const {Provider} = require('react-redux')
-
-const myRoutes = () => {
+//
+const myRoutes = () => (
   <Route path='/' component={Layout}>
     <IndexRoute component={Landing} />
     <Route path='/search' component={Search} />
     <Route path='/details/:id' component={Details} />
   </Route>
-}
+)
 
 const App = React.createClass({
   render () {
@@ -27,6 +27,6 @@ const App = React.createClass({
   }
 })
 
-App.routes = myRoutes
+App.Routes = myRoutes
 
 module.exports = App
