@@ -18,7 +18,7 @@ const app = express()
 app.use('/public', express.static('./public'))
 
 app.use((req, res, next) => {
-  match({ routes: Routes(), location: req.url }, (err, redirectLocation, renderProps) => {
+  match({ routes: Routes, location: req.url }, (err, redirectLocation, renderProps) => {
     if (err) return next(err)
 
     if (redirectLocation) return res.redirect(`${redirectLocation.pathname}${redirectLocation.search}`)

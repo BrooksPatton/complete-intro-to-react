@@ -1,32 +1,56 @@
 const React = require('react')
-const Landing = require('./landing')
-const {Router, Route, browserHistory, IndexRoute} = require('react-router')
-const Search = require('./search')
+const {Router, browserHistory} = require('react-router')
 const Layout = require('./layout')
-const Details = require('./Details')
 const {store} = require('./Store')
 const {Provider} = require('react-redux')
-//
-const myRoutes = () => (
-  <Route path='/' component={Layout}>
-    <IndexRoute component={Landing} />
-    <Route path='/search' component={Search} />
-    <Route path='/details/:id' component={Details} />
-  </Route>
-)
+
+if (typeof module !== 'undefined' && module.require) {
+  if (typeof require.ensure === 'undefined') {
+    require.ensure = require('node-ensure')
+  }
+}
+
+const rootRoute = {
+  component: Layout,
+  path: '/',
+  indexRoute: {
+    getComponent (location, cb) {
+      require.ensure([], (err) => {
+        cb(null, require('./landing'))
+      })
+    }
+  },
+  childRoutes: [
+    {
+      path: 'search',
+      getComponent (location, cb) {
+        require.ensure([], (err) => {
+          cb(null, require('./search'))
+        })
+      }
+    },
+    {
+      path: 'details/:id',
+      getComponent (location, cb) {
+        require.ensure([], (err) => {
+          cb(null, require('./Details'))
+        })
+      }
+    }
+  ]
+}
 
 const App = React.createClass({
   render () {
     return (
       <Provider store={store}>
-        <Router history={browserHistory}>
-          {myRoutes()}
-        </Router>
+        <Router history={browserHistory} routes={rootRoute} />
       </Provider>
     )
   }
 })
 
-App.Routes = myRoutes
+App.Routes = rootRoute
+App.History = browserHistory
 
 module.exports = App
