@@ -1,23 +1,17 @@
 const React = require('react')
 const Header = require('./Header')
-const { connector } = require('./Store')
+const { connector, store } = require('./Store')
 const axios = require('axios')
 //
 class Details extends React.Component {
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      omdbData: {}
-    }
-  }
-
   componentDidMount () {
-    axios.get(`http://www.omdbapi.com/?i=${this.assignShow(this.props.params.id).imdbID}`)
-      .then((response) => {
-        this.setState({omdbData: response.data})
-      })
-      .catch((err) => console.error('axios error', err))
+    if (this.getImdbRating(this.props.params.id) === 'getting rating') {
+      axios.get(`http://www.omdbapi.com/?i=${this.assignShow(this.props.params.id).imdbID}`)
+        .then((result) => {
+          this.props.setImdbRating({id: this.props.params.id, rating: result.data.imdbRating})
+        })
+        .catch((err) => console.error('axios error', err))
+    }
   }
 
   assignShow (id) {
@@ -25,12 +19,19 @@ class Details extends React.Component {
     return showArray[0]
   }
 
+  getImdbRating (id) {
+    const ratings = this.props.imdbRatings.filter((rating) => rating.id === id)
+
+    return ratings[0] ? ratings[0].rating : 'getting rating'
+  }
+
   render () {
     const { title, description, year, poster, trailer } = this.assignShow(this.props.params.id)
+
     let rating
 
-    if (this.state.omdbData.imdbRating) {
-      rating = <h3 className='video-rating'>{this.state.omdbData.imdbRating}</h3>
+    if (this.getImdbRating(this.props.params.id)) {
+      rating = <h3 className='video-rating'>{this.getImdbRating(this.props.params.id)}</h3>
     }
 
     return (
@@ -39,7 +40,7 @@ class Details extends React.Component {
         <div className='video-info'>
           <h1 className='video-title'>{title}</h1>
           <h2 className='video-year'>({year})</h2>
-          {rating}
+          {this.getImdbRating(this.props.params.id)}
           <img className='video-poster' src={`/public/img/posters/${poster}`} />
           <p className='video-description'>{description}</p>
         </div>
@@ -51,11 +52,13 @@ class Details extends React.Component {
   }
 }
 
-const { object, arrayOf } = React.PropTypes
+const { object, arrayOf, func } = React.PropTypes
 
 Details.propTypes = {
   shows: arrayOf(object).isRequired,
-  params: object
+  params: object,
+  setImdbRating: func,
+  imdbRatings: arrayOf(object)
 }
 
 module.exports = connector(Details)
