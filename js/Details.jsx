@@ -1,8 +1,25 @@
 const React = require('react')
 const Header = require('./Header')
 const { connector } = require('./Store')
+const axios = require('axios')
 //
 class Details extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      omdbData: {}
+    }
+  }
+
+  componentDidMount () {
+    axios.get(`http://www.omdbapi.com/?i=${this.assignShow(this.props.params.id).imdbID}`)
+      .then((response) => {
+        this.setState({omdbData: response.data})
+      })
+      .catch((err) => console.error('axios error', err))
+  }
+
   assignShow (id) {
     const showArray = this.props.shows.filter((show) => show.imdbID === id)
     return showArray[0]
@@ -10,14 +27,20 @@ class Details extends React.Component {
 
   render () {
     const { title, description, year, poster, trailer } = this.assignShow(this.props.params.id)
-    console.log(title)
+    let rating
+
+    if (this.state.omdbData.imdbRating) {
+      rating = <h3 className='video-rating'>{this.state.omdbData.imdbRating}</h3>
+    }
+
     return (
       <div className='container'>
         <Header />
         <div className='video-info'>
           <h1 className='video-title'>{title}</h1>
           <h2 className='video-year'>({year})</h2>
-          <img className='video-poster' src={`/img/posters/${poster}`} />
+          {rating}
+          <img className='video-poster' src={`/public/img/posters/${poster}`} />
           <p className='video-description'>{description}</p>
         </div>
         <div className='video-container'>
