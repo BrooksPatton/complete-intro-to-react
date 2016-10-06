@@ -1,7 +1,7 @@
 const React = require('react')
 const {Link} = require('react-router')
 const { connector } = require('./Store')
-const { hashHistory } = require('react-router')
+const { browserHistory } = require('react-router')
 
 class Landing extends React.Component {
   constructor (props) {
@@ -19,7 +19,7 @@ class Landing extends React.Component {
   gotoSearch (event) {
     event.preventDefault()
 
-    hashHistory.push('search')
+    browserHistory.push('search')
   }
 
   removeSearchTerm () {
